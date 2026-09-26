@@ -6,7 +6,11 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+reports/
 .env
 .DS_Store
 .vscode/
 .idea/
+
+# Keep the supplied example env file tracked even though .env is ignored.
+!.env.example
