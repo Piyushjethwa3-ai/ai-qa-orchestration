@@ -1,0 +1,26 @@
+[
+  {
+    "employee_id": "EMP001",
+    "full_name": "Dana Whitfield",
+    "department": "Finance",
+    "email": "dana.whitfield@northstar.example"
+  },
+  {
+    "employee_id": "EMP002",
+    "full_name": "Marcus Lee",
+    "department": "Sales",
+    "email": "marcus.lee@northstar.example"
+  },
+  {
+    "employee_id": "EMP003",
+    "full_name": "Priya Nair",
+    "department": "Engineering",
+    "email": "priya.nair@northstar.example"
+  },
+  {
+    "employee_id": "EMP004",
+    "full_name": "Oliver Grant",
+    "department": "Human Resources",
+    "email": "oliver.grant@northstar.example"
+  }
+]

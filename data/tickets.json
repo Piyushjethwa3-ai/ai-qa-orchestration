@@ -1,0 +1,56 @@
+[
+  {
+    "ticket_id": "TCK-1001",
+    "employee_id": "EMP001",
+    "subject": "VPN client fails to connect from home network",
+    "description": "Getting a timeout error when connecting to VPN from home Wi-Fi.",
+    "status": "open",
+    "created_at": "2026-09-20T09:15:00Z",
+    "updated_at": "2026-09-20T09:15:00Z"
+  },
+  {
+    "ticket_id": "TCK-1002",
+    "employee_id": "EMP002",
+    "subject": "VPN password reset needed",
+    "description": "Forgot VPN password after the recent policy change.",
+    "status": "resolved",
+    "created_at": "2026-09-18T11:00:00Z",
+    "updated_at": "2026-09-19T10:00:00Z"
+  },
+  {
+    "ticket_id": "TCK-1003",
+    "employee_id": "EMP003",
+    "subject": "VPN disconnects every 10 minutes",
+    "description": "Connection drops intermittently throughout the work day.",
+    "status": "in_progress",
+    "created_at": "2026-09-21T14:30:00Z",
+    "updated_at": "2026-09-22T08:00:00Z"
+  },
+  {
+    "ticket_id": "TCK-1004",
+    "employee_id": "EMP004",
+    "subject": "Need VPN access for new laptop",
+    "description": "Requesting VPN profile installation on a newly issued laptop.",
+    "status": "open",
+    "created_at": "2026-09-23T09:00:00Z",
+    "updated_at": "2026-09-23T09:00:00Z"
+  },
+  {
+    "ticket_id": "TCK-1005",
+    "employee_id": "EMP001",
+    "subject": "VPN slow during video calls",
+    "description": "Bandwidth appears low during video calls while on VPN.",
+    "status": "in_progress",
+    "created_at": "2026-09-24T13:00:00Z",
+    "updated_at": "2026-09-24T15:00:00Z"
+  },
+  {
+    "ticket_id": "TCK-1006",
+    "employee_id": "EMP002",
+    "subject": "VPN certificate expired",
+    "description": "VPN client shows a certificate expired error on login.",
+    "status": "resolved",
+    "created_at": "2026-09-15T10:00:00Z",
+    "updated_at": "2026-09-16T09:30:00Z"
+  }
+]

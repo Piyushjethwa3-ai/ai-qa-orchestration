@@ -1,0 +1,6 @@
+{
+  "service": "vpn",
+  "status": "operational",
+  "updated_at": "2026-09-25T08:00:00Z",
+  "message": "VPN service is running normally."
+}
