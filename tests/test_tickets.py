@@ -38,3 +38,8 @@ def test_ticket_matches_schema(client):
 
     # Raises jsonschema.exceptions.ValidationError if the ticket is invalid.
     jsonschema.validate(instance=ticket, schema=schema)
+
+def test_missing_ticket_returns_404(client):
+    response = client.get("/tickets/TCK-9999", headers={"X-Demo-Employee-ID": "EMP001"})
+
+    assert response.status_code == 404
