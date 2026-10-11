@@ -21,9 +21,16 @@ confidence, before AI features are layered on in later weeks.
 | `data/tickets.json` | 6 synthetic VPN tickets |
 | `data/service_status.json` | Current synthetic VPN status |
 | `schemas/ticket.schema.json` | JSON Schema a ticket must satisfy |
-| `tests/` | Baseline pytest suite (`TestClient`, no network calls) |
+| `schemas/employee.schema.json` | JSON Schema for an employee profile response |
+| `schemas/service_status.schema.json` | JSON Schema for the VPN status response (BR04) |
+| `schemas/error.schema.json` | JSON Schema for the API's error shape (`{"detail": ...}`) |
+| `tests/conftest.py` | Shared `client` fixture + the `--day2-fault` option registration |
+| `tests/test_*.py` | Day 1 baseline suite (`TestClient`, no network calls) |
+| `tests/day2/` | Day 2 lessons: fixtures, parametrization, ownership, schema validation |
 | `docs/business_rules.md` | BR01–BR04, in plain language |
 | `docs/week1-learning-log.md` | Template for your own daily notes |
+| `docs/day2-instructor-map.md` | Day 2 lesson-by-lesson map and verification record |
+| `docs/day2-run-evidence.md` | Sanitised Day 2 run results and coverage summary |
 
 ## Prerequisites
 
@@ -149,17 +156,107 @@ curl -i http://127.0.0.1:8000/employees/me
 
 ## Running the tests
 
-With the virtual environment active (same command on macOS/Linux and
-Windows PowerShell):
+**Every test command in this section is identical on macOS/Linux and
+Windows PowerShell.** Only the activation step differs, and you must do
+it first, in every new terminal:
+
+| Platform | Activate | Install/refresh dependencies |
+| --- | --- | --- |
+| macOS/Linux | `source .venv/bin/activate` | `python -m pip install -e ".[dev]"` |
+| Windows PowerShell | `.venv\Scripts\Activate.ps1` | `python -m pip install -e ".[dev]"` |
+
+`".[dev]"` installs pytest plus the two report plugins (`pytest-html`,
+`pytest-json-report`) used in the report section below. If you set this
+project up before Day 2, re-run the install command to pick them up.
+
+### Do I need the API running in another terminal?
+
+**No — not for any test command below.** The tests use FastAPI's
+`TestClient`, which calls the app in-process; there is no network call
+and no server to start. You only need `uvicorn` if you want to poke the
+API by hand with curl or Swagger UI (see
+[Running the API locally](#running-the-api-locally) above):
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+That command is the same on macOS/Linux and Windows PowerShell.
+
+### Day 1 tests only
+
+The three original Day 1 files, named explicitly:
+
+```bash
+python -m pytest tests/test_tickets.py tests/test_employees.py tests/test_service_status.py -v
+```
+
+Expected: **7 passed**.
+
+### Day 2 tests only
+
+```bash
+python -m pytest tests/day2 -v
+```
+
+Expected: **14 passed** — fixtures (2), parametrization (5), ownership
+(2), and schema validation (5).
+
+### Full suite
 
 ```bash
 python -m pytest -v
 ```
 
-This runs the baseline suite in `tests/`: one test per endpoint plus a
-dedicated ticket-ownership test. It is intentionally small — Day 1 and
-Day 2 exercises ask you to extend it (missing header, unknown employee,
-missing ticket, and more).
+Expected: **21 passed** (7 Day 1 + 14 Day 2).
+
+### Fault demonstrations (expected failures)
+
+Day 2 includes a test-only fault-injection flag, `--day2-fault`, used to
+prove the tests actually detect broken behaviour rather than passing
+vacuously. **It is off by default and has no effect on the application
+itself** — it only works inside pytest, only when passed explicitly, and
+pytest's `monkeypatch` reverts it after every single test. It never
+writes to `data/`.
+
+Each command below is *supposed* to fail. A failure here is the correct,
+expected result:
+
+| Command | Expected result |
+| --- | --- |
+| `python -m pytest tests/day2/test_03_ownership.py --day2-fault=ownership -v` | **2 failed** — both cross-employee tests fail with `assert 200 == 403`, because the BR02 ownership check was patched to always pass. |
+| `python -m pytest tests/day2/test_04_schema.py --day2-fault=missing-status -v` | **1 failed, 4 passed** — `test_service_status_matches_schema` fails with `ValidationError: 'status' is a required property`. |
+| `python -m pytest tests/day2/test_04_schema.py --day2-fault=wrong-status-type -v` | **1 failed, 4 passed** — same test fails with `ValidationError: 1 is not of type 'string'`. |
+
+To confirm nothing persisted, re-run the same file with no flag — it
+should go back to all-passing:
+
+```bash
+python -m pytest tests/day2 -v
+```
+
+### Report generation
+
+Both report plugins come from `".[dev]"`. Output goes to `reports/`,
+which is **git-ignored on purpose** — reports embed local machine paths
+and are rebuilt on demand, so they are not committed.
+
+```bash
+python -m pytest -v --html=reports/day2-report.html --self-contained-html --json-report --json-report-file=reports/day2-report.json
+```
+
+Same command on macOS/Linux and Windows PowerShell. If `reports/`
+doesn't exist yet:
+
+- macOS/Linux: `mkdir -p reports`
+- Windows PowerShell: `New-Item -ItemType Directory -Force reports`
+
+Open `reports/day2-report.html` in a browser for the human-readable
+version; `reports/day2-report.json` is the machine-readable one.
+
+Sanitised, committed evidence of the Day 2 runs lives in
+[`docs/day2-run-evidence.md`](docs/day2-run-evidence.md) instead of the
+raw reports.
 
 ## Business rules
 

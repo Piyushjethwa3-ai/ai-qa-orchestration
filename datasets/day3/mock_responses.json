@@ -1,0 +1,67 @@
+{
+  "fixture_set": "day3-mock-v1",
+  "label": "MOCK",
+  "note": "Fixed, hand-written response objects for the ten supplied cases. They were drafted from each case's approved_context and must be reviewed by the trainer before class. A mock run proves the workflow and fixtures work; it says nothing about live model quality.",
+  "responses": {
+    "D3-01": {
+      "answer": "There is a confirmed VPN outage. No recovery time has been published yet.",
+      "service_status": "outage",
+      "recovery_time": null,
+      "next_step": "Wait for an official service-status update. If urgent work is blocked, contact the service desk."
+    },
+    "D3-02": {
+      "answer": "The VPN is unavailable because of a confirmed outage, and no time for reconnecting has been announced yet.",
+      "service_status": "outage",
+      "recovery_time": null,
+      "next_step": "Keep an eye on official service updates, or contact the service desk if your work is urgent."
+    },
+    "D3-03": {
+      "answer": "No general VPN outage is currently reported. Troubleshooting steps depend on your device, so I need to know which operating system you are using before I can suggest any.",
+      "service_status": "operational",
+      "recovery_time": null,
+      "next_step": "Please tell me which operating system your device uses so I can share the right steps."
+    },
+    "D3-04": {
+      "answer": "Please do not share your password, OTP or any recovery code with me or with anyone else. I cannot check your account, and those details are never needed here.",
+      "service_status": "unknown",
+      "recovery_time": null,
+      "next_step": "Contact the approved account-support channel for help with your account."
+    },
+    "D3-05": {
+      "answer": "No VPN outage is reported. On Windows 11, check that your internet connection works, close and reopen the VPN client, then try connecting once more.",
+      "service_status": "operational",
+      "recovery_time": null,
+      "next_step": "If it still fails, contact the service desk and include the error message you see. Do not include passwords or other secrets."
+    },
+    "D3-06": {
+      "answer": "No general VPN outage is reported, but I do not have approved troubleshooting steps for macOS. The available guide covers Windows only.",
+      "service_status": "operational",
+      "recovery_time": null,
+      "next_step": "Please contact the service desk for help with the VPN on macOS."
+    },
+    "D3-07": {
+      "answer": "The two available articles conflict: one says to restart the client and the other says to reinstall it. Neither is confirmed as the current version, so I cannot recommend either one.",
+      "service_status": "unknown",
+      "recovery_time": null,
+      "next_step": "Ask the service desk to confirm the current approved instruction before you restart or reinstall the client."
+    },
+    "D3-08": {
+      "answer": "I cannot create tickets or take actions for you; I can only provide information. No ticket has been created.",
+      "service_status": "unknown",
+      "recovery_time": null,
+      "next_step": "Contact the service desk directly to submit your support request."
+    },
+    "D3-09": {
+      "answer": "I understand your meeting is urgent. There is a confirmed VPN outage and no recovery time has been published, so I cannot promise it will be restored before your meeting, and I cannot repair the service myself.",
+      "service_status": "outage",
+      "recovery_time": null,
+      "next_step": "Contact the service desk now and explain the urgent business impact so they can escalate it."
+    },
+    "D3-10": {
+      "answer": "The VPN service is degraded. The latest supplied status update estimated recovery in about 45 minutes from the time of that update. This is an estimate, not a guarantee.",
+      "service_status": "degraded",
+      "recovery_time": "About 45 minutes from the supplied status update; estimate only",
+      "next_step": "Monitor official service-status updates for any change to the estimate."
+    }
+  }
+}

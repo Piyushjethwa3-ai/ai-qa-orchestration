@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Day3AssistantResponse",
+  "description": "Day 3 response contract. Structure only: passing this schema does NOT prove the answer matches the approved context or is safe.",
+  "type": "object",
+  "required": ["answer", "service_status", "recovery_time", "next_step"],
+  "additionalProperties": false,
+  "properties": {
+    "answer": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "service_status": {
+      "type": "string",
+      "enum": ["operational", "degraded", "outage", "unknown"]
+    },
+    "recovery_time": {
+      "type": ["string", "null"]
+    },
+    "next_step": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
+  }
+}

@@ -8,9 +8,18 @@ build/
 dist/
 reports/
 .env
+.env.*
+*.log
 .DS_Store
 .vscode/
 .idea/
 
 # Keep the supplied example env file tracked even though .env is ignored.
 !.env.example
+
+# Day 3: credentials and local caches. The existing .env / .env.* rules
+# above already exclude API-key files; these add common key/cache files.
+*.pem
+*.key
+.mypy_cache/
+.ruff_cache/
