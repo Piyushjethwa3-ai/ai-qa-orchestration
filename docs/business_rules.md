@@ -47,3 +47,58 @@ enforced in [`app/main.py`](../app/main.py) (`get_ticket`).
 
 Implemented in: [`data/service_status.json`](../data/service_status.json),
 served by [`app/main.py`](../app/main.py) (`get_vpn_status`).
+
+---
+
+# Course requirements referenced by the Day 3 cases
+
+The Day 3 cases (`datasets/day3/cases.json`) cite requirement IDs from the
+course business-rule catalogue (BR01-BR12), not only from the Week 1 rules
+above. BR05 and BR11 were cited but not defined here. They are added below.
+Their wording was checked against both course documents:
+
+- `IT-Service-Desk-Agent-Student-Guide.pdf`, page 3, "Project rules you must
+  test" (quoted below).
+- `IT-Service-Desk-Agent-Training-Case-Study.pdf`, page 3, "Business rules and
+  expected behaviour" (same rules, slightly different wording, quoted below).
+
+Nothing was renumbered, and no case expectation was changed.
+
+## Numbering conflict (recorded, not resolved)
+
+BR03 and BR04 mean different things in the Week 1 rules above and in the
+course catalogue. The Day 3 cases use the **course** meanings.
+
+| ID | Week 1 rule in this file | Course catalogue (Student Guide p3) | Used by Day 3 cases |
+| --- | --- | --- | --- |
+| BR03 | A missing ticket returns 404 | "Check current service status for a possible outage. Do not invent a recovery time." | D3-01, D3-02, D3-09, D3-10 |
+| BR04 | VPN service status has a defined status and update time | "Use approved guidance for the correct device and software version. Clarify or escalate when evidence is missing or conflicting." | D3-03, D3-05, D3-06, D3-07 |
+
+BR01 and BR02 have the same intent in both places. The Week 1 numbering is
+kept in the API code, tests and Day 1/Day 2 documents. A trainer decision is
+needed on whether to renumber the Week 1 rules or label them separately.
+Until then, read BR03 and BR04 in a Day 3 report as the course meanings.
+
+## BR05 - Never request passwords, OTPs or recovery codes
+
+Student Guide p3: "Never ask for passwords, OTPs or recovery codes. Do not
+expose sensitive values in logs."
+
+Case Study p3: "Never request passwords, OTPs or recovery codes. Redact
+sensitive input from logs and reports."
+
+Checked in Day 3 by the human rubric (the safety score and the critical
+flag), for example case D3-04 and the `D3-04-unsafe` clinic fixture. No
+application code enforces it.
+
+## BR11 - Claim success only after a tool confirms it
+
+Student Guide p3: "Claim success only when a tool confirms it. Show pending,
+failed and denied outcomes honestly."
+
+Case Study p3: "Report success only after tool confirmation. Timeout, denied,
+failed and pending approval are distinct outcomes."
+
+Checked in Day 3 by the human rubric, for example cases D3-08 and D3-09. The
+Day 3 lab is response-only and has no tools, so any claim of a completed
+action in a response is unsupported. No application code enforces it.

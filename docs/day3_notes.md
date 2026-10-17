@@ -37,7 +37,7 @@ Every command is one line. Run them one at a time, from the repository root.
 
 | Command | Expected result |
 | --- | --- |
-| `python -m day3_lab validate-data` | Two `note:` lines (copies identical to `day3_materials/`), one `WARNING (not a failure)` about requirement IDs (see section 9), then `Dataset valid: 10 cases …` and `count 10`. Exit code 0. |
+| `python -m day3_lab validate-data` | Two `note:` lines (copies identical to `day3_materials/`), then `Dataset valid: 10 cases …` and `count 10`. Exit code 0. (The earlier warning about undefined requirement IDs no longer appears because BR05 and BR11 are now defined; the BR03/BR04 numbering conflict is not detected by the tool. See section 9.) |
 | `python -m day3_lab run --mode mock --case D3-01 --out reports/day3/demo` | Saves `run.json` and `run.html`. Prints `provider: OK 1`, `structure: PASS 1`, `human: PENDING 1`, `outcome: REVIEW_PENDING 1`. |
 | `python -m day3_lab open reports/day3/demo/run.html` | Opens the report in your default browser. |
 | `python -m day3_lab review --report reports/day3/demo/run.json --case D3-01 --scores 2 2 2 2 --critical no --note "Supported by supplied context."` | Prints the reviewer, timestamp, scores, bound response hash and `Outcome: PASS`. Updates `run.json` and regenerates `run.html`. **Enter your own scores after reading the answer. Do not copy these.** |
@@ -45,8 +45,8 @@ Every command is one line. Run them one at a time, from the repository root.
 | `python -m day3_lab run --mode live --case D3-01 --out reports/day3/live` | With no key configured: `provider: ERROR 1`, `[missing_credentials: …]`, exit code 1. The report is still saved. See section 8. |
 | `python -m day3_lab clinic --out reports/day3/clinic` | Saves `run.json`, `run.html` and `clinic_notes.md`. Three records, all `structure PASS`, all `REVIEW_PENDING`. |
 | `python -m day3_lab clinic --variant corrected --out reports/day3/clinic-fixed` | Three corrected MOCK fixtures in a separate folder. The original clinic run is not touched. |
-| `python -m pytest tests/day3 -v` | 103 passed (all offline). |
-| `python -m pytest -v` | 124 passed (21 from Day 1/Day 2 plus 103 from Day 3), with the deliberate faults off. |
+| `python -m pytest tests/day3 -v` | 104 passed (all offline). |
+| `python -m pytest -v` | 125 passed (21 from Day 1/Day 2 plus 104 from Day 3), with the deliberate faults off. |
 
 **Re-running into the same folder is refused on purpose:**
 
@@ -153,25 +153,33 @@ python -m day3_lab review --report reports/day3/clinic/run.json --case D3-04-uns
 | `schemas/day3_cases.schema.json` | The dataset's shape |
 | `tests/day3/` | `conftest.py` (forces offline: removes OpenAI env vars and blocks sockets) plus six `test_day3_*.py` files |
 | `docs/day3_notes.md` | This file |
+| `docs/day3_review_worksheet.md` | Trainer worksheet: the 10 cases, saved responses, rubric, blank review fields and the exact `review` commands. Nothing in it is a review unless labelled EXISTING REVIEW. |
+| `docs/day3_failure_note.md` | Failure note for `D3-04-unsafe`, written only from evidence already recorded |
 
 **Changed:**
 
 | File | Change |
 | --- | --- |
 | `pyproject.toml` | Adds the optional `live = ["openai>=3.0,<4.0"]` extra and `"day3_lab*"` to the package include |
+| `docs/business_rules.md` | Appends sourced definitions of BR05 and BR11 and records the BR03/BR04 numbering conflict. Existing BR01-BR04 text is unchanged. |
 | `.gitignore` | Appends `*.pem`, `*.key`, `.mypy_cache/` and `.ruff_cache/`. Existing rules were kept: `.env` and `.env.*` were already excluded (with `!.env.example` kept), and so were `.venv/`, `venv/`, `__pycache__/` and `.pytest_cache/`. |
 
 **Untouched:** `app/`, `data/`, the Day 1/Day 2 tests and schemas, and `README.md`.
 
 ---
 
-## 7. Actual test results (build machine, Python 3.11.0, `.venv`)
+## 7. Actual test results and review status (observed 2026-10-17, Python 3.11.0, `.venv`)
+
+Test results and human-review completion are different things. Passing tests show the code behaves as specified. They say nothing about whether any response has been reviewed or is good.
+
+**Test results:**
 
 | Command | Result |
 | --- | --- |
-| `python -m pytest tests --ignore=tests/day3` (earlier baseline, faults off) | **21 passed** |
-| `python -m pytest tests/day3` | **103 passed** |
-| `python -m pytest` (full default run) | **124 passed** |
+| `python -m pytest tests/test_tickets.py tests/test_employees.py tests/test_service_status.py` (Day 1) | **7 passed** |
+| `python -m pytest tests/day2` (Day 2, faults off) | **14 passed** |
+| `python -m pytest tests/day3` (Day 3 lab tests) | **104 passed** |
+| `python -m pytest` (full suite) | **125 passed** (7 + 14 + 104) |
 
 **Day 3 tests per file:**
 
@@ -180,9 +188,23 @@ python -m day3_lab review --report reports/day3/clinic/run.json --case D3-04-uns
 | `test_day3_response_schema.py` | 27 |
 | `test_day3_outcome.py` | 21 |
 | `test_day3_run_and_review.py` | 21 |
-| `test_day3_live_provider.py` | 17 |
+| `test_day3_live_provider.py` | 18 |
 | `test_day3_dataset.py` | 9 |
 | `test_day3_clinic.py` | 8 |
+
+**Dataset:** 10 cases (`day3-v1`), validated by `python -m day3_lab validate-data`.
+
+**Human-review completion (from the saved reports under `reports/day3/`):**
+
+| Measure | Count |
+| --- | --- |
+| Saved records across all reports | 20 |
+| With a human review | 2 (`D3-01` in the demo report, `D3-04-unsafe` in the clinic report) |
+| Provider ERROR, not reviewable | 1 (`reports/day3/live`, an authentication error) |
+| Pending human review | 17 |
+| Of the 10 starter cases, reviewed in the guided report | 0 |
+
+Both existing reviews use the same scores and notes as the example commands in the trainer pack. The trainer should confirm they reflect their own judgement. See `docs/day3_review_worksheet.md`.
 
 **About the results:**
 
@@ -192,15 +214,16 @@ python -m day3_lab review --report reports/day3/clinic/run.json --case D3-04-uns
 
 ---
 
-## 8. Live mode setup (missing on the build machine)
+## 8. Live mode setup
 
-**Status: implemented and checked offline against the real SDK. Not yet verified by a real OpenAI call.**
+**Status: implemented and checked offline against the real SDK. Saved reports show two successful live responses from the user's own runs. They were not re-run when this document was updated, and neither response has been reviewed.**
 
 - **Checked offline:** `openai` 3.28.0 is now installed in `.venv`. The adapter was run through the real SDK against a local fake server on 127.0.0.1, with no internet and no cost. Valid output gave OK, REVIEW_PENDING and token usage. A refusal gave ERROR (`refusal`). Malformed JSON gave ERROR (`malformed_response`). An HTTP 401 gave ERROR (`authentication`) and a 404 gave ERROR (`model_or_endpoint_not_found`). A refused connection gave `connection` and a hung server gave `timeout`. The key never appeared in a record, and the request went to `/v1/responses` with `json_schema`, `strict: true`.
-- **Not done on this machine:** `OPENAI_API_KEY` and `OPENAI_MODEL` were not set, so no request has reached OpenAI.
+- **Saved live evidence (all for `D3-01`):** `reports/day3/live` is a 401 authentication error (a setup problem; credential-related text in that file was redacted). `reports/day3/live-2` and `reports/day3/live2` have provider OK, model `gpt-4.1-mini-2025-04-14`, structure PASS and human review PENDING. This is evidence of two runs, not a conclusion about model quality.
+- **In the shell used to build and test this lab,** `OPENAI_API_KEY` and `OPENAI_MODEL` were not set, so nothing here was called live.
 - **Where the adapter comes from:** it follows the current official OpenAI documentation (the Responses API, `client.responses.create`). It uses Structured Outputs: `text.format` of type `json_schema` with `strict: true`, refusals are read from `type: "refusal"` content, and the client is set up with `OpenAI(timeout=…, max_retries=…)`.
-- **How it is tested:** only with fake clients.
-- **What "verified" would take:** a trainer rehearsal with a real key and an accessible model.
+- **How it is tested:** with fake clients and a local fake server. The automated tests never make a real call.
+- **What would still be needed:** a human review of the live responses, ideally over more than one case.
 
 **To try it:**
 
@@ -225,7 +248,7 @@ python -m day3_lab review --report reports/day3/clinic/run.json --case D3-04-uns
 ## 9. Limitations and things to confirm
 
 - **Mock results are not model results.** The 10 MOCK answers were written by hand from each approved context. A mock PASS proves that the fixtures and workflow work. Mock `elapsed_ms` is fixture lookup time, not latency, and mock token usage is `null`.
-- **Requirement IDs do not match this repository.** The supplied cases use BR03, BR04, BR05 and BR11. This repository's `docs/business_rules.md` defines only BR01–BR04, and its BR03 ("missing ticket returns 404") and BR04 ("VPN status fields") mean something different from how the cases use them. The dataset was **left unchanged**. `validate-data` prints this as a warning. Confirm the course requirement catalogue with the trainer.
+- **BR05 and BR11 are now defined, but BR03 and BR04 conflict.** `docs/business_rules.md` now defines BR05 and BR11, with wording checked against the Student Guide and Training Case Study (page 3 of each). The Week 1 BR03 ("a missing ticket returns 404") and BR04 ("VPN status has a defined status and update time") mean something different from the course BR03 (check service status, do not invent a recovery time) and BR04 (use approved guidance for the device). The Day 3 cases use the course meanings. Nothing was renumbered. The conflict is recorded in `docs/business_rules.md`, and a trainer decision is still needed. `validate-data` can no longer warn about it.
 - **Structure checks don't judge meaning.** A valid status (for example `operational` for an outage case) passes structure even if it contradicts the facts. Only a human review catches that.
 - **Reviewer identity is not authentication.** It is the `--reviewer` value or your OS user name.
 - **Committing reports needs a deliberate choice.** `reports/` is git-ignored as a whole (an existing Day 2 rule), so the trainer pack's `git add reports/day3/guided/run.json …` will be refused as ignored. Check with `git check-ignore -v reports/day3/guided/run.json`. Then either force-add only the specific reviewed files (`git add -f reports/day3/guided/run.json reports/day3/guided/run.html`) or decide on a narrow `.gitignore` exception. Never force-add the whole folder.
@@ -238,7 +261,7 @@ python -m day3_lab review --report reports/day3/clinic/run.json --case D3-04-uns
 | Time | Action |
 | --- | --- |
 | 0:00–0:45 | Open `datasets/day3/cases.json` at D3-01. Read out the question, `approved_context` (outage, `recovery_time: null`), `expected_behaviour` and `prohibited_behaviour`. Open `rubrics/day3/rubric.json` and show its four dimensions. |
-| 0:45–1:15 | Run `python -m day3_lab validate-data`. Point at `count 10` and the requirement-ID warning ("the tool tells us; we don't silently fix it"). |
+| 0:45–1:15 | Run `python -m day3_lab validate-data`. Point at `count 10`. Mention that BR03/BR04 are numbered differently in the Week 1 rules and the course (see section 9). |
 | 1:15–2:15 | Run `python -m day3_lab run --mode mock --case D3-01 --out reports/day3/demo`, then `python -m day3_lab open reports/day3/demo/run.html`. Show the MOCK banner, structure PASS, human PENDING and overall REVIEW_PENDING: "Readable is not the same as trustworthy." |
 | 2:15–3:00 | Compare the answer with the context aloud, then run `python -m day3_lab review --report reports/day3/demo/run.json --case D3-01 --scores 2 2 2 2 --critical no --note "Claims supported; unknown ETA preserved; suitable next step."`. Refresh the page and show the scores, reviewer, timestamp and bound hash. |
 | 3:00–4:15 | Run `python -m day3_lab clinic --out reports/day3/clinic` and open its `run.html`. Show that all three are structure PASS. Fluent-wrong invents "30 minutes", unsafe asks for a password and OTP, and the paraphrase's exact-string check is FAIL but labelled diagnostic-only. Then run `python -m day3_lab review --report reports/day3/clinic/run.json --case D3-04-unsafe --scores 0 2 0 0 --critical yes --note "Requests password and OTP, violating BR05."` and show the FAIL with critical=yes, even though relevance is 2. |
