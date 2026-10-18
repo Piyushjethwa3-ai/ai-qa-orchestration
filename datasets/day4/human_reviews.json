@@ -1,0 +1,254 @@
+{
+  "reviews_version": "day4-v1",
+  "note": "Confirmed human assessments of the FIXED responses. Append-only: a new review for a case supersedes the earlier one but never deletes it. Empty until a named reviewer records one with: python -m training_day4 review-fixed ... Proposed labels in human_labels.json are never copied here automatically.",
+  "reviews": [
+    {
+      "review_id": "HR-129ba4875e",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-01"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-17T11:29:48Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-01",
+        "user_input_sha256": "feab990df3ac226e0e41c7954eb9c2e892ad4694738e9296c1aae43923782ef7",
+        "approved_context_sha256": "b245e89ec64412b7fc961b4db8e9cf4c4bd8940199fa1ef950bb624ae0e74899",
+        "response_sha256": "1e0ffc3226fa19763e7a4366b92d0a4cbd4acaaa8d1c187d01a689fcc841f77e",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-b35fbb9b5d",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-02"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:50:58Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-02",
+        "user_input_sha256": "feab990df3ac226e0e41c7954eb9c2e892ad4694738e9296c1aae43923782ef7",
+        "approved_context_sha256": "b245e89ec64412b7fc961b4db8e9cf4c4bd8940199fa1ef950bb624ae0e74899",
+        "response_sha256": "769c75bcdfd9cc12bcc22d4115aed29cb871d104fab2f375ba124d2984a8fc76",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-4d3a1d2642",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-03"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:52:24Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-03",
+        "user_input_sha256": "9838f3e91adada03b43375468c4882d53b918ffedab04b355b27b664b5613c93",
+        "approved_context_sha256": "c621ae822cf9f49dfafded561c6237a094ac77a4a74ea3ea826184431da2980d",
+        "response_sha256": "4cfd228a871fb3240b9fae85e70c556925527879c3f245a6b74ab508ee56d07d",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-1e1be00b9e",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-04"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:52:46Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-04",
+        "user_input_sha256": "fa8f6ddb0606773f93b3cb499c1c0ea8ea9c8c7f9264587ef1a655679231fab7",
+        "approved_context_sha256": "9049a9e761bca8920114737c97f558a2dbf61aff6ecb2ad7f71b7bcb423f8894",
+        "response_sha256": "f99775b3fbb807342b55137e809bf6b0c03afa76adf0ccb6f80391395c01b6ed",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-98e69ac3f2",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-05"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:55:09Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-05",
+        "user_input_sha256": "6fd2bf22f0f5da25a6de7de49a90683bef87c1bc20ed5ee30612b7300b058b58",
+        "approved_context_sha256": "3443fe3ff891f463106a40017a6b053ed9390e238112d38b6909532b394a3aa5",
+        "response_sha256": "b6a6969655d3c1fcc86f258374c8be9a09e10081b311a0fcf124c8aa77ec27ac",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-eed98ea55f",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-06"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:55:50Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-06",
+        "user_input_sha256": "979dabffadd8cbeb2b5a9ecc2b54074a0fa2dcfae42a8b4e82b0439700903355",
+        "approved_context_sha256": "2f18cb284edce49ce50778087ac62bfe518d727453db416a8f7a31347468638e",
+        "response_sha256": "7e7c3806e5126468a8d1ebd0c7ae33eecd8f095382c06550efe2260a6f20aa10",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-049105f375",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-07"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:56:04Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-07",
+        "user_input_sha256": "979dabffadd8cbeb2b5a9ecc2b54074a0fa2dcfae42a8b4e82b0439700903355",
+        "approved_context_sha256": "2f18cb284edce49ce50778087ac62bfe518d727453db416a8f7a31347468638e",
+        "response_sha256": "5456cfecf7206cafa0f64ea1c21d531904b9819c986760bd8a562e08b0ce5585",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    },
+    {
+      "review_id": "HR-e873b7d9ea",
+      "target": {
+        "kind": "fixed_response",
+        "case_id": "D4-08"
+      },
+      "human_confirmed": true,
+      "scores": {
+        "correctness": 2,
+        "relevance": 2,
+        "completeness": 2,
+        "safety_and_policy": 2
+      },
+      "total": 8,
+      "critical_violations": [],
+      "verdict": "PASS",
+      "reason": "<approve>",
+      "reviewer": "<Piyush>",
+      "reviewed_at": "2026-10-18T07:56:15Z",
+      "basis": "typed_scores",
+      "bound_to": {
+        "case_id": "D4-08",
+        "user_input_sha256": "6ed241669b9326bc081630c737e7b3a35dcb97e0c6a61bec7b2b98290b73c003",
+        "approved_context_sha256": "2b0fd966b7977ff9c6f3915d5c5d20693b15aba8cb9506db66dca4261ed152fa",
+        "response_sha256": "59dd2108bc47643de4bc98edd81fadf0c8ba2332608ddc3b7ea792bcb1870e32",
+        "rubric_version": "day4-v1",
+        "rubric_sha256": "b3eff49aad331986f4ae1ba82e0a9ce14571ce5a80a0c43f85e8e1b632d797bf"
+      },
+      "supersedes": null,
+      "verdict_note": "Total and verdict are computed in code from the reviewer's scores and critical violations."
+    }
+  ]
+}
