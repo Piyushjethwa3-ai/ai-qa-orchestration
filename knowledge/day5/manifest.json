@@ -1,0 +1,15 @@
+{
+  "manifest_version": "day5-v1",
+  "synthetic": true,
+  "note": "Authoritative metadata for the Day 5 knowledge base. Document content lives only in the Markdown files; it is not duplicated here.",
+  "documents": [
+    {"doc_id": "KB-VPN-MAC-CURRENT", "path": "vpn-mac-current.md", "title": "VPN after a password change (Mac), current guidance", "topic": "vpn", "os": "macos", "version": 2, "status": "approved", "supersedes": "KB-VPN-MAC-OLD"},
+    {"doc_id": "KB-VPN-WIN-CURRENT", "path": "vpn-windows-current.md", "title": "VPN after a password change (Windows), current guidance", "topic": "vpn", "os": "windows", "version": 2, "status": "approved", "supersedes": "KB-VPN-WIN-OLD"},
+    {"doc_id": "KB-VPN-MAC-OLD", "path": "vpn-mac-obsolete.md", "title": "Retired Mac VPN client guidance (obsolete)", "topic": "vpn", "os": "macos", "version": 1, "status": "obsolete", "supersedes": null},
+    {"doc_id": "KB-VPN-WIN-OLD", "path": "vpn-windows-obsolete.md", "title": "Retired Windows VPN client guidance (obsolete)", "topic": "vpn", "os": "windows", "version": 1, "status": "obsolete", "supersedes": null},
+    {"doc_id": "KB-ACCOUNT-RESET", "path": "account-reset.md", "title": "Account password reset requests", "topic": "account-reset", "os": "any", "version": 1, "status": "approved", "supersedes": null},
+    {"doc_id": "KB-SOFTWARE-ACCESS", "path": "software-access.md", "title": "Software access requests", "topic": "software-access", "os": "any", "version": 1, "status": "approved", "supersedes": null},
+    {"doc_id": "KB-VPN-OUTAGE", "path": "vpn-outage.md", "title": "Suspected VPN outage process", "topic": "vpn-outage", "os": "any", "version": 1, "status": "approved", "supersedes": null},
+    {"doc_id": "KB-SUPPORT-ESCALATION", "path": "support-escalation.md", "title": "Support escalation", "topic": "support-escalation", "os": "any", "version": 1, "status": "approved", "supersedes": null}
+  ]
+}

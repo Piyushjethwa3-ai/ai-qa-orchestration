@@ -258,6 +258,76 @@ Sanitised, committed evidence of the Day 2 runs lives in
 [`docs/day2-run-evidence.md`](docs/day2-run-evidence.md) instead of the
 raw reports.
 
+## Day 5: local document retrieval and retrieval evaluation
+
+Day 5 adds a small **local, deterministic** retriever and an evaluation that scores it on its own, before any
+model is involved. It uses only the Python standard library: no model calls, embeddings, vector database or
+network. Days 1–4 are unchanged.
+
+**One-time setup.** The new package must be registered with the editable install (no new dependency):
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+**Commands** (run from the project root, with the virtual environment activated; they work the same on
+macOS/Linux and Windows PowerShell):
+
+```bash
+python -m training_day5 --help
+python -m training_day5 validate
+python -m training_day5 list-docs
+python -m training_day5 show-doc --id KB-VPN-MAC-CURRENT
+python -m training_day5 show-case --id R01
+python -m training_day5 retrieve --case R01 --top-k 3
+python -m training_day5 retrieve --query "vpn password change" --os macos --top-k 3
+python -m training_day5 evaluate --cases all --top-k 3
+python -m training_day5 summary --run latest
+```
+
+**Failure clinic (synthetic faults).** Faults are off by default and apply only to the command that names them.
+Every fault run is labelled `SYNTHETIC FAULT INJECTION` and records whether the fault was actually applied
+(`NOT APPLIED` means its precondition was absent, so nothing may be claimed from it):
+
+```bash
+python -m training_day5 evaluate --cases R01 --top-k 3 --fault obsolete-first
+python -m training_day5 evaluate --cases R01 --top-k 3 --fault wrong-os
+python -m training_day5 evaluate --cases R07 --top-k 3 --fault drop-required
+```
+
+`evaluate` exits `0` when every selected case passes, `1` when it completed but at least one case failed
+(the report is still saved), and `2` for invalid input or an execution error.
+
+**What is where**
+
+| Path | What it is |
+| --- | --- |
+| `knowledge/day5/` | 8 synthetic Markdown documents (6 approved, 2 obsolete) and `manifest.json` (authoritative metadata) |
+| `datasets/day5/retrieval_cases.json` | 10 labelled cases (8 answerable, 2 unanswerable) |
+| `policies/day5_retrieval_policy.md` | Documents the filtering, scoring and evaluation rules. It is **not** indexed. |
+| `training_day5/` | The retriever, evaluator, faults, reports and CLI |
+| `tests/day5/` | Offline tests (network blocked, reports in a temporary folder) |
+| `reports/day5/<run_id>/` | `results.json` and `report.md` for each evaluation (git-ignored, never overwritten) |
+
+Run the Day 5 tests with `python -m pytest tests/day5 -v`. They need no credentials and no network.
+
+**Limitations**
+
+- Scores are **lexical word-overlap counts**, not confidence probabilities, and a positive score does not prove a
+  document answers the question. There is no stemming beyond a trailing plural "s" and no synonyms.
+- Retrieval is scored at **document level** (the document ID is the unit). Passages are not scored and there is
+  no chunking.
+- The lexical baseline is **expected to fail some cases**. For example, a question that needs a separate
+  escalation procedure can be outranked by other VPN documents, and an unsupported question can still retrieve a
+  general document that shares a word. Those failures are recorded as they happen; labels are never edited to
+  make a report pass.
+- Ten cases are a classroom demonstration, not evidence that retrieval is reliable. A failed retrieval check is
+  not proof of model hallucination, and a passing one says nothing about answer quality.
+- Reports record the Git commit and whether the working tree was dirty when they were produced.
+
+The Day 1 and Day 2 sections above predate Days 3–5, so their "Expected: N passed" counts are out of date: the
+full suite now also includes the Day 3, Day 4 and Day 5 tests.
+
 ## Business rules
 
 See [`docs/business_rules.md`](docs/business_rules.md) for BR01–BR04 and
