@@ -264,6 +264,8 @@ def cmd_calibrate(args, **_kw) -> int:
     written = runstore.finish_run(run_dir, run, markdown.render(run))
     cov = run["coverage"]
     print(f"Run ID: {run['run_id']}   Status: {run['status']}")
+    print(f"Source judge run: {judge_run['run_id']}   Source evidence mode: {judge_run['mode'].upper()}")
+    print("Calibration execution: offline comparison of saved assessments (no model calls, no replay fixtures)")
     print(f"Confirmed human reviews: {cov['confirmed_human_reviews']}/{cov['cases']}   valid judge evaluations: {run['tally']['valid_judge_evaluations']}/{cov['cases']}")
     if not run["human_calibration"]["available"]:
         print("Confirmed human agreement: unavailable (no valid pairs with a confirmed human review).")

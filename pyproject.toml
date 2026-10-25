@@ -28,7 +28,7 @@ live = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["app*", "day3_lab*"]
+include = ["app*", "day3_lab*", "training_day4*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

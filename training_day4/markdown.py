@@ -45,9 +45,15 @@ def usage_text(call) -> str:
 
 def header(run: dict) -> str:
     models = run["models"]
-    model_line = ("Replay: no model was called." if run["mode"] == "replay" or "note" in models else
+    model_line = (models["note"] if "note" in models else
                   f"generation `{models['generation']}`; judge `{models['judge']}` (from {models['judge_model_source']}); "
                   f"same model for generation and judging: {models['same_model_for_generation_and_judging']}")
+    if run["kind"] == "calibrate":
+        mode_rows = [("Calibration execution", run["execution"]),
+                     ("Source judge run", f"`{run['source_judge_run']['run_id']}`"),
+                     ("Source evidence mode", run["source_evidence_mode"].upper())]
+    else:
+        mode_rows = [("Mode", run["mode"].upper())]
     out = [
         f"# Day 4 {run['kind']} report",
         "",
@@ -58,7 +64,7 @@ def header(run: dict) -> str:
     out += [
         "",
         table(["Field", "Value"], [
-            ("Run ID", f"`{run['run_id']}`"), ("Mode", run["mode"].upper()), ("Status", run["status"]),
+            ("Run ID", f"`{run['run_id']}`"), *mode_rows, ("Status", run["status"]),
             ("Created", run["created_at"]), ("Git commit", f"`{run['git']['commit']}` (dirty: {run['git']['dirty']})"),
             ("Models", model_line), ("Generation settings", run["settings"] if isinstance(run["settings"], str) else
                                      f"{run['settings']['generation']}; temperature {run['settings']['temperature']}; max attempts per call {run['settings']['max_attempts_per_call']}"),

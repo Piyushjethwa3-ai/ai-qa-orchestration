@@ -175,6 +175,10 @@ Development and holdout are reported separately, with judge and human verdicts s
 - A comparison with the **proposed** labels is shown separately and marked **PROVISIONAL**. It is not human calibration.
 - A replay-based calibration says it is a workflow demonstration, not validation of a live judge.
 
+**What a calibration run is.** Calibration compares *saved* judge assessments with *saved* human reviews. It calls no model and reads no replay fixtures, so it is an **offline comparison**, not live or replay evidence itself. Its report therefore shows three separate facts: the **source judge run ID**, the **source evidence mode (LIVE or REPLAY)**, and the **calibration execution (offline comparison)**. Its run folder is named `calibrate-offline-from-live-...` or `calibrate-offline-from-replay-...`, and `run.json` has `mode: "offline"` plus `source_evidence_mode`. `summary` files a calibration under the mode of the evidence it describes.
+
+*Earlier calibration folders* named `calibrate-replay-...` were saved before this was made explicit. For those, the folder name and the "Replay" wording in the Models row and the `replay_fixtures_sha256` hash are labelling errors: the comparison was offline, and the source mode is whatever `source_judge_run.mode` says. Their results are unaffected and the folders are kept as they were. To get a clearly labelled report, calibrate the same source again with `calibrate --run <judge-run-id>`, which creates a new folder.
+
 `calibrate --run latest-fixed` picks the newest fixed-response judge run, prints its ID and mode, and **refuses** (rather than quietly choosing an older run) if that newest run is unfinished, if any run metadata is corrupted, or if two judge runs share the newest timestamp. A finalised run with some evaluation errors can still be calibrated; the errors stay visible.
 
 ---
@@ -200,7 +204,7 @@ The comparison report offers only a **provisional preference or "inconclusive"**
 ## 8. Inspecting reports
 
 - `report.md` is the readable view (tables and reasons). `run.json` is the structured evidence.
-- Every report records: run ID and kind, live or replay, time, Git commit and dirty flag, model IDs (and whether generation and judging share one), generation settings, hashes of the dataset, rubric, judge prompt, response prompts and judge schema, call counts (planned, made, API attempts, retries, failed, not attempted) for generation and judging **separately**, and each response with its judge input, assessment, errors and any heuristic flags.
+- Every report records: run ID and kind, live or replay (for a calibration: the source evidence mode, with the execution shown as offline), time, Git commit and dirty flag, model IDs (and whether generation and judging share one), generation settings, hashes of the dataset, rubric, judge prompt, response prompts and judge schema, call counts (planned, made, API attempts, retries, failed, not attempted) for generation and judging **separately**, and each response with its judge input, assessment, errors and any heuristic flags.
 - Heuristic flags are simple text patterns that can be false alarms. They never change a score or verdict.
 - A run that crashed stays marked `finalised: false` / `in_progress`, so it can't be mistaken for a result. `summary` shows it as UNFINISHED.
 - Run files are sanitised: the API key (exact, or any key-like or masked text) is replaced with `[REDACTED]`.
@@ -243,8 +247,8 @@ Not reused, because they are bound to Day 3's record format and rubric: `assessm
 | Day 1 tests | 7 passed |
 | `python -m pytest tests/day2` | 14 passed |
 | `python -m pytest tests/day3` | 104 passed |
-| `python -m pytest tests/day4` | 82 passed |
-| `python -m pytest -v` (full suite) | **207 passed** |
+| `python -m pytest tests/day4` | 85 passed |
+| `python -m pytest -v` (full suite) | **210 passed** |
 
 All Day 4 tests run offline: they clear the OpenAI variables, block network connections, use fake SDK clients, and write to temporary folders. There is no new pytest flag. In a separate check, four faults were injected in memory (a label leaking into the judge input, an invalid judge output turned into a PASS, `latest-fixed` skipping an unfinished run, and the total >= 7 rule dropped); the Day 4 suite failed for each one.
 
@@ -278,7 +282,7 @@ Replay commands run: `validate`, `show-case`, `judge`, `calibrate`, `compare`, a
 | `datasets/day4/replay_fixtures.json` | Authored replay responses and judge outputs |
 | `prompts/day4/judge.txt`, `response_a.txt`, `response_b.txt` | The frozen judge prompt and the two response prompts |
 | `schemas/day4_judge_output.schema.json` | The judge's required output shape |
-| `tests/day4/` | Offline protection and 82 focused tests |
+| `tests/day4/` | Offline protection and 85 focused tests |
 | `docs/day4_review_worksheet.md` | Trainer worksheet |
 | `docs/business_rules.md` | Appended BR06 and the Day 4 reference check |
 | `pyproject.toml` | Package discovery now includes `training_day4*` (no dependency change) |

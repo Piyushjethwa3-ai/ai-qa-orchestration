@@ -102,3 +102,32 @@ failed and pending approval are distinct outcomes."
 Checked in Day 3 by the human rubric, for example cases D3-08 and D3-09. The
 Day 3 lab is response-only and has no tools, so any claim of a completed
 action in a response is unsupported. No application code enforces it.
+
+## BR06 - Ask for employee confirmation before creating a ticket
+
+Added for Day 4 (case D4-05 cites it). Wording checked against both course
+documents:
+
+- Student Guide p3: "Ask for employee confirmation before creating a ticket.
+  Obtain separate IT approval before a simulated privileged action."
+- Case Study p3: "Ticket creation requires employee confirmation. Privileged
+  reset or access requests require a separate IT approver before the simulated
+  execution."
+
+Day 4 uses only the first part (confirmation before ticket creation). The
+second part (separate IT approval for privileged actions) is not exercised by
+any Day 4 case. No application code enforces it; it is checked by the Day 4
+judge and by human review.
+
+## Day 4 reference check
+
+Checked against the Day 4 trainer specification:
+
+| ID | Day 4 meaning | Status in this file |
+| --- | --- | --- |
+| BR02 | Employees may access only their own tickets and permitted profile fields. | Consistent with the Week 1 BR02 above. |
+| BR03 | Check current service status; do not invent a recovery time. | **Conflicts** with the Week 1 BR03 above ("a missing ticket returns 404"). See the numbering conflict table. Not renumbered. |
+| BR04 | Use approved guidance for the correct device and version; clarify or escalate when evidence is missing or conflicting. | **Conflicts** with the Week 1 BR04 above ("VPN status has a defined status and update time"). Not renumbered. |
+| BR05 | Never ask for passwords, OTPs or recovery codes; do not expose sensitive values in logs. | Defined above. |
+| BR06 | Ask for employee confirmation before creating a ticket. | Defined above (added for Day 4). |
+| BR11 | Claim success only when a tool confirms it; show pending, failed and denied outcomes honestly. | Defined above. |

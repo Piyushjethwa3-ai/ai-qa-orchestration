@@ -49,7 +49,7 @@ class Context:
         self.rubric_text = judge.render_rubric(self.rubric)
         self.critical_text = judge.render_critical_categories(self.rubric)
         self.prompt_texts = {k: p.read_text(encoding="utf-8") for k, p in paths.RESPONSE_PROMPT_PATHS.items()}
-        self.replay = replay if replay is not None else (replay_module.ReplayFixtures() if mode == "replay" else None)
+        self.replay = replay if replay is not None else (replay_module.ReplayFixtures() if mode == "replay" else None)  # "offline": none needed
         if mode == "live":
             kwargs = {"env": env}
             if sleep is not None:
@@ -77,7 +77,7 @@ def base_run(ctx: Context, kind: str, extra: dict | None = None) -> dict:
         "response_prompt_b_sha256": data.sha256_file(paths.RESPONSE_PROMPT_PATHS["B"]),
         "judge_output_schema_sha256": data.sha256_file(paths.JUDGE_SCHEMA_PATH),
     }
-    if not live:
+    if ctx.mode == "replay":  # only runs that actually use the fixtures record their hash
         hashes["replay_fixtures_sha256"] = data.sha256_file(paths.REPLAY_PATH)
     run = {
         "run_id": runstore.new_run_id(kind, ctx.mode),
@@ -98,13 +98,13 @@ def base_run(ctx: Context, kind: str, extra: dict | None = None) -> dict:
             "response_b": ctx.prompt_texts["B"],
         },
         "models": (ctx.config.models_record() if live else {"generation": None, "judge": None,
-                   "note": "Replay: no model was called."}),
+                   "note": "Replay: no model was called." if ctx.mode == "replay" else "No model was called."}),
         "configuration_notes": ctx.config.notes if live else [],
         "settings": ({"generation": client_module.GENERATION_SETTINGS, "judge": client_module.JUDGE_SETTINGS,
                       "temperature": "not set (the model's default applies)", "sdk_retries": 0,
                       "max_attempts_per_call": client_module.MAX_ATTEMPTS,
                       "retry_policy": "transient errors only (timeout, connection, rate limit, 5xx); never to improve a score"}
-                     if live else "not applicable (replay)"),
+                     if live else f"not applicable ({ctx.mode})"),
         "dependency_note": data.dependency_note(ctx.dataset),
         "records": [],
         "limitations": [],
@@ -386,22 +386,29 @@ def _pair_metrics(pairs: list[dict]) -> dict:
 
 
 def run_calibrate(judge_dir, judge_run: dict) -> dict:
-    ctx = Context("replay")  # only to reuse the frozen inputs and hashes; calibrate never calls a model
+    ctx = Context("offline")  # reuses the frozen inputs and hashes only; calibrate calls no model and uses no replay fixtures
     cases = data.cases_by_id(ctx.dataset)
     proposed = data.labels_by_id(data.load_labels())
     review_doc = reviews.load_doc(paths.REVIEWS_PATH, {"reviews": []})
     current = reviews.current_reviews(review_doc, "case_id")
     by_case = {r["case_id"]: r for r in judge_run["records"]}
 
+    source_mode = judge_run["mode"]
     run = base_run(ctx, "calibrate", {
-        "mode": judge_run["mode"],
+        # An offline comparison of SAVED assessments. It is neither live nor replay evidence itself.
+        "run_id": runstore.new_run_id("calibrate", f"offline-from-{source_mode}"),
+        "mode": "offline",
+        "execution": "offline comparison of saved assessments (no model calls, no replay fixtures)",
+        "source_evidence_mode": source_mode,
         "source_judge_run": {"run_id": judge_run["run_id"], "mode": judge_run["mode"], "status": judge_run["status"],
                              "created_at": judge_run["created_at"], "directory": paths.display(judge_dir),
                              "hashes": judge_run["hashes"], "models": judge_run["models"]},
     })
-    run["label"] = (f"CALIBRATION of a {judge_run['mode'].upper()} fixed-response judge run. No model was called by this step.")
-    run["mode_note"] = (replay_module.REPLAY_NOTE if judge_run["mode"] == "replay" else
-                        "Calibration compares recorded judge output with human reviews. It makes no model calls.")
+    run["label"] = (f"OFFLINE CALIBRATION of a {source_mode.upper()} fixed-response judge run. "
+                    "This step made no model calls and used no replay fixtures.")
+    run["mode_note"] = ("Calibration is an offline comparison of saved assessments. The evidence mode "
+                        f"({source_mode.upper()}) belongs to the source judge run, not to this calibration. "
+                        + (replay_module.REPLAY_NOTE if source_mode == "replay" else ""))
     run["models"] = {"note": "calibrate calls no model. The judge models are recorded in source_judge_run.models."}
     run["settings"] = "not applicable (calibrate makes no calls)"
     run["configuration_notes"] = []
@@ -473,6 +480,7 @@ def run_calibrate(judge_dir, judge_run: dict) -> dict:
                     "valid_judge_evaluations": total - run["coverage"]["cases_without_valid_judge_evaluation"]}
     run["status"] = "completed"
     run["limitations"] = [
+        "Calibration is an offline comparison of saved assessments. It is not itself live or replay evidence.",
         "Eight examples demonstrate the classroom workflow. They do not show that a judge is reliable.",
         "The broader Week 2 target is at least 15 genuinely human-labelled responses plus wider coverage. Cases are not duplicated to reach it.",
         data.dependency_note(ctx.dataset),

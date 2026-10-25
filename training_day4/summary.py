@@ -25,6 +25,12 @@ HASH_NAMES = {"dataset_cases_sha256": paths.CASES_PATH, "rubric_sha256": paths.R
               "judge_prompt_sha256": paths.JUDGE_PROMPT_PATH}
 
 
+def evidence_mode(run: dict) -> str:
+    """live or replay. A calibration is an offline comparison, so it is grouped by its SOURCE evidence mode.
+    Calibrations saved before the mode was split out carry the source mode in `mode`."""
+    return run.get("source_evidence_mode", run["mode"])
+
+
 def status_word(run: dict) -> str:
     if not run["finalised"]:
         return "UNFINISHED"
@@ -47,7 +53,7 @@ def collect() -> dict:
     corrupted = [(e.path.name, e.problem) for e in entries if e.problem]
     rows = []
     for kind, mode in ACTIVITIES:
-        matching = [e for e in runs if e.run["kind"] == kind and e.run["mode"] == mode]
+        matching = [e for e in runs if e.run["kind"] == kind and evidence_mode(e.run) == mode]
         if not matching:
             rows.append({"activity": kind, "mode": mode, "status": "NOT RUN", "runs": 0, "command": COMMANDS[kind].format(mode=mode)})
             continue

@@ -178,7 +178,8 @@ def test_replay_calibration_is_labelled_a_workflow_demonstration(run_cli, report
     make_judge_run(run_cli)
     _, run = calibrate(run_cli, reports)
 
-    assert "workflow demonstration" in " ".join(run["limitations"]) and run["mode"] == "replay"
+    assert "workflow demonstration" in " ".join(run["limitations"])
+    assert run["source_evidence_mode"] == "replay" and run["mode"] == "offline"
     assert run["coverage"]["gap_to_week2_target"] == 15
 
 
@@ -283,3 +284,82 @@ def test_a_provisional_preference_needs_every_answer_reviewed_by_a_human():
     reading = execute.compare_assessment(run, reviews)
 
     assert reading["preference"] == "provisional_B" and "not an approval" in reading["text"]
+
+
+# ------------------------------------------------------------------ calibration is an offline comparison
+
+ALL_CRITICAL_NONE = ("--critical", "NONE")
+
+
+def record_reviews_for_all_cases(run_cli):
+    for case in data.ALL_CASE_IDS:
+        code, _, _ = run_cli("review-fixed", "--case", case, "--confirm-proposed",
+                             "--reason", "Test review.", "--reviewer", "Dr. Rao")
+        assert code == 0
+
+
+def test_calibrating_live_evidence_is_labelled_as_an_offline_comparison_of_live_evidence(run_cli, make_live, reports):
+    live = make_live()
+    assert run_cli("judge", "--mode", "live", "--cases", "all", env=live.env, client=live.client)[0] == 0
+    source_id = next(iter(reports()))
+    record_reviews_for_all_cases(run_cli)
+    requests_before = len(live.sdk.requests)
+    source_bytes = (paths.REPORTS_DIR / source_id / "run.json").read_bytes()
+    reviews_bytes = paths.REVIEWS_PATH.read_bytes()
+
+    code, out, _ = run_cli("calibrate", "--run", source_id)  # explicit source run
+    calibration = next(v for v in reports().values() if v["kind"] == "calibrate")
+    report = (paths.REPORTS_DIR / calibration["run_id"] / "report.md").read_text()
+
+    assert code == 0
+    # An unambiguous run ID: it names the calibration as offline and the source mode, not "replay".
+    assert calibration["run_id"].startswith("calibrate-offline-from-live-") and "replay" not in calibration["run_id"]
+    # Source, source mode and execution are separate, explicit fields.
+    assert calibration["source_judge_run"]["run_id"] == source_id and calibration["source_judge_run"]["mode"] == "live"
+    assert calibration["source_evidence_mode"] == "live" and calibration["mode"] == "offline"
+    assert "offline comparison" in calibration["execution"] and "no model calls" in calibration["execution"]
+    # No replay residue anywhere: not in the hashes, the report, the on-screen summary or the run ID.
+    assert "replay_fixtures_sha256" not in calibration["hashes"]
+    allowed = ("no replay fixtures", "not itself live or replay evidence")  # explicit negations, not residue
+    for text in (report, out):
+        remainder = text.lower()
+        for phrase in allowed:
+            remainder = remainder.replace(phrase, "")
+        assert "replay" not in remainder
+    assert "Source evidence mode | LIVE" in report and "Calibration execution | offline comparison" in report
+    assert f"Source judge run: {source_id}   Source evidence mode: LIVE" in out
+    assert "Calibration execution: offline comparison" in out
+    # The comparison itself is offline and changes nothing.
+    assert len(live.sdk.requests) == requests_before
+    assert (paths.REPORTS_DIR / source_id / "run.json").read_bytes() == source_bytes
+    assert paths.REVIEWS_PATH.read_bytes() == reviews_bytes
+    assert calibration["coverage"]["confirmed_human_reviews"] == 8 and calibration["tally"]["valid_judge_evaluations"] == 8
+
+
+def test_calibrating_replay_evidence_is_also_an_offline_comparison_not_a_replay_run(run_cli, reports):
+    assert run_cli("judge", "--mode", "replay", "--cases", "all")[0] == 0
+    source_id = next(iter(reports()))
+    run_cli("calibrate", "--run", "latest-fixed")
+    calibration = next(v for v in reports().values() if v["kind"] == "calibrate")
+
+    assert calibration["run_id"].startswith("calibrate-offline-from-replay-")
+    assert calibration["mode"] == "offline" and calibration["source_evidence_mode"] == "replay"
+    assert "replay_fixtures_sha256" not in calibration["hashes"]  # this step did not read the fixtures
+    assert "replay_fixtures_sha256" in calibration["source_judge_run"]["hashes"]  # the source run did
+    assert "Replay: no model was called" not in (paths.REPORTS_DIR / calibration["run_id"] / "report.md").read_text()
+
+
+def test_summary_files_a_calibration_under_the_mode_of_its_source_evidence(run_cli, make_live):
+    from training_day4 import summary
+
+    live = make_live()
+    run_cli("judge", "--mode", "live", "--cases", "all", env=live.env, client=live.client)
+    run_cli("calibrate", "--run", "latest-fixed")
+    out = run_cli("summary")[1]
+    rows = {tuple(l.split()[:2]): l for l in out.splitlines() if l.startswith(("calibrate", "judge"))}
+
+    assert "COMPLETED" in rows[("calibrate", "live")] and "NOT RUN" in rows[("calibrate", "replay")]
+    # Calibrations saved before the change put the source mode in `mode`; they are still grouped correctly.
+    assert summary.evidence_mode({"kind": "calibrate", "mode": "live"}) == "live"
+    assert summary.evidence_mode({"kind": "calibrate", "mode": "offline", "source_evidence_mode": "replay"}) == "replay"
+    assert summary.evidence_mode({"kind": "judge", "mode": "live"}) == "live"
