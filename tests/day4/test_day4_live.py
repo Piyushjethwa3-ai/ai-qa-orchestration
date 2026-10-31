@@ -90,7 +90,7 @@ def test_an_authentication_error_is_not_retried(make_live, errors):
 
 
 def test_a_refusal_is_an_error_and_is_not_retried(make_live):
-    from conftest import refusal_response
+    from day4_support import refusal_response
 
     live = make_live(lambda request, n: refusal_response())
 
@@ -100,7 +100,7 @@ def test_a_refusal_is_an_error_and_is_not_retried(make_live):
 
 
 def test_malformed_judge_output_and_low_scores_are_never_retried(run_cli, make_live, reports):
-    from conftest import sdk_response
+    from day4_support import sdk_response
 
     live = make_live(lambda request, n: sdk_response("not json") if "text" in request else None)
     run_cli("judge", "--mode", "live", "--cases", "D4-01", env=live.env, client=live.client)
@@ -116,7 +116,7 @@ def test_malformed_judge_output_and_low_scores_are_never_retried(run_cli, make_l
 
 
 def test_missing_usage_is_unavailable_not_zero(make_live):
-    from conftest import sdk_response
+    from day4_support import sdk_response
 
     live = make_live(lambda request, n: sdk_response("ok", usage=False))
 

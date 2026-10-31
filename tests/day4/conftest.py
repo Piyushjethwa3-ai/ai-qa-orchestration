@@ -24,6 +24,8 @@ import pytest
 
 from training_day4 import cli, client as client_module, paths
 
+from day4_support import refusal_response, sdk_response  # noqa: F401  (FakeSDK uses sdk_response)
+
 KEY = "sk-test-not-a-real-key-123456"
 LIVE_ENV = {"OPENAI_API_KEY": KEY, "OPENAI_MODEL": "gen-model"}
 
@@ -75,18 +77,6 @@ def reports():
 
 
 # ---------------------------------------------------------------- fake SDK
-
-def sdk_response(text, *, usage=True, model="gen-model-2026"):
-    return SimpleNamespace(
-        model=model, status="completed", incomplete_details=None,
-        output=[SimpleNamespace(type="message", content=[SimpleNamespace(type="output_text", text=text)])],
-        usage=SimpleNamespace(input_tokens=11, output_tokens=7, total_tokens=18) if usage else None)
-
-
-def refusal_response():
-    return SimpleNamespace(model="gen-model-2026", status="completed", incomplete_details=None, usage=None,
-                           output=[SimpleNamespace(type="message", content=[SimpleNamespace(type="refusal", refusal="No.")])])
-
 
 def judge_json(request, scores=(2, 2, 2, 2), critical=()):
     response_id = re.search(r"Response ID \(copy it back exactly\): (R-[0-9a-f]{8})", request["input"]).group(1)
