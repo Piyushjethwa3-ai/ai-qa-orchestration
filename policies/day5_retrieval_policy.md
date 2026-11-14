@@ -18,15 +18,29 @@
 
 Metadata for this filtering comes from `knowledge/day5/manifest.json`, which is authoritative. Document text comes only from the Markdown files.
 
+**Eligibility is not relevance.** Passing these filters only makes a document a *candidate*. It does not establish that the document is relevant to the question, or that the question is answerable. A document can be eligible and still contain nothing that answers the question (for example, a general document for an unsupported question). Relevance is judged separately by the lexical score and, above all, by whether the document actually contains the evidence needed (see sections 3 and 4).
+
+**One Markdown file is one document.** For this lab each file in `knowledge/day5/` is retrieved and scored as a whole. There is no chunking, so a passage inside a file is never retrieved on its own, and the scoring unit is the document ID.
+
 ## 3. Ranking and scoring
 
 Scores are **lexical** word-overlap counts. They are **not confidence probabilities**.
 
-- **Tokenising.** Lower-case letters and digits. Document IDs such as `KB-VPN-MAC-CURRENT` are removed first, so an ID is never scored. A fixed stopword list is dropped. A trailing plural "s" is removed from words longer than three letters (`passwords` becomes `password`; `access` is left alone).
+- **Tokenising.** Lower-case letters and digits only. Document IDs written in their canonical upper-case form, such as `KB-VPN-MAC-CURRENT`, are removed first, so those IDs are not scored. An ID typed in lower case is **not** recognised as an ID and is tokenised as ordinary words (`kb-vpn-mac-current` becomes `kb`, `vpn`, `mac`, `current`), which can match documents like any other words. The words in the fixed stopword list (below) are dropped. A trailing plural "s" is removed from words longer than three letters (`passwords` becomes `password`; `access` is left alone).
 - **Score.** For each **distinct** query term: +1 if it appears in the document content (headings included) and +2 if it appears in the manifest title. The score is the sum.
 - **Results.** Only documents with a **positive** score are returned. Order is highest score first, ties broken by `doc_id`. Results are unique, limited to top-k, and top-k must be a whole number of at least 1.
 
 No case-specific rule exists anywhere in the retriever.
+
+### Fixed stopword list
+
+These 67 words are ignored in queries and documents. The list is the `STOPWORDS` constant in `training_day5/retriever.py`, and a test checks that this block and the code contain exactly the same words.
+
+```text
+a about after all an and any are as at be been but by can could did do does for from had has have
+how i if in into is it its me my no not of on or our should so than that the their then there these
+they this to up was we were what when where which who why will with would you your
+```
 
 ### Scoring limitations (kept, not hidden)
 

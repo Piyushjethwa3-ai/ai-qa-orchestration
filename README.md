@@ -317,6 +317,9 @@ Run the Day 5 tests with `python -m pytest tests/day5 -v`. They need no credenti
   document answers the question. There is no stemming beyond a trailing plural "s" and no synonyms.
 - Retrieval is scored at **document level** (the document ID is the unit). Passages are not scored and there is
   no chunking.
+- Queries and documents are tokenised the same way: a fixed list of 67 common words is ignored (the list is in
+  `policies/day5_retrieval_policy.md`), and document IDs such as `KB-VPN-MAC-CURRENT` are removed before scoring
+  **only when written in upper case**. An ID typed in lower case is scored as ordinary words.
 - The lexical baseline is **expected to fail some cases**. For example, a question that needs a separate
   escalation procedure can be outranked by other VPN documents, and an unsupported question can still retrieve a
   general document that shares a word. Those failures are recorded as they happen; labels are never edited to
