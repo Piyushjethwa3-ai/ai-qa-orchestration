@@ -331,10 +331,110 @@ Run the Day 5 tests with `python -m pytest tests/day5 -v`. They need no credenti
 The Day 1 and Day 2 sections above predate Days 3–5, so their "Expected: N passed" counts are out of date: the
 full suite now also includes the Day 3, Day 4 and Day 5 tests.
 
+## Week 5 agent and Day 6 security and governance
+
+This adds a **rule-based service desk agent** (plain Python, **no language model, no network, no API key**) with
+simulated tools, and the security controls around it. Days 1–5 are unchanged: the original routes behave exactly as
+before, and every new route is additive. **The agent is deterministic: the same input always gives the same output.**
+
+**What it does.** An employee message goes to the agent, which checks service status first, asks which device when it
+is not known, retrieves the matching approved guide (the Day 5 retriever, unchanged), looks up existing tickets, and
+*proposes* a ticket. Nothing is created until the employee confirms. A password-reset request becomes a **pending IT
+approval** and runs only after a simulated IT approver approves that exact request. Every tool call passes through one
+gateway that applies a permission matrix and writes a redacted audit record.
+
+**Two ways to try it, with no server and no setup beyond the virtual environment** (the commands are identical on
+macOS/Linux and Windows PowerShell; run from the project root with the virtual environment activated):
+
+```bash
+python -m app.agent list                     # Week 5 agent on its own (no governance layer)
+python -m app.agent demo vpn-ticket
+python -m app.agent chat --employee EMP002   # talk to it
+python -m app.governance list                # Day 6 governed agent (permissions, approvals, audit)
+python -m app.governance demo privileged
+python -m app.governance chat --employee EMP001
+python -m evaluators injection-demo          # prompt injection against the real tool boundary
+```
+
+`docs/day6_demo_guide.md` is the classroom guide: five demonstrations with the exact commands, expected output, the
+business rule and what students should observe. A test re-runs every command in it, so it cannot go stale.
+
+**Tests and evaluations:**
+
+```bash
+python -m pytest tests/agent -v
+python -m pytest tests/day6 -v
+python -m pytest -q
+python -m evaluators trajectories
+python -m evaluators trajectories --cases B-01 B-05
+python -m evaluators audit-example
+```
+
+`trajectories` runs the 36 cases in `datasets/agent/trajectory_cases.json` (A-01 to A-30 are the Week 5 behaviours,
+B-01 to B-06 are the governance cases) and saves `results.json` and `report.md` to a new `reports/agent/<run_id>/`
+folder (git-ignored, never overwritten). It exits `0` when every case passes, `1` when one fails, `2` for invalid
+input. `audit-example` prints the deterministic redacted audit records used in `docs/day6_audit_examples.md`.
+
+**Fresh clone.** No new dependency and no API key. Create the virtual environment and run
+`python -m pip install -e ".[dev]"` once (it registers the new `evaluators` package; the rest is already covered),
+then `python -m pytest -q`. The classroom guide has the exact macOS/Linux and Windows PowerShell steps.
+
+**Tickets: file-backed versus in-memory.** The Week 1 API reads `data/tickets.json`. The agent keeps the tickets it
+creates in **memory only**, so they vanish when the program or server exits, and `GET /tickets/TCK-1007` returns 404 for
+a ticket the agent just created. This is deliberate for the lab; persistence was not changed.
+
+**Trying the API by hand** (`python -m uvicorn app.main:app --port 8000`). Employees use `X-Demo-Employee-ID`; the
+simulated IT approvers (`APR001`, `APR002`) use `X-Demo-Approver-ID`. Windows PowerShell versions of these calls are in
+the classroom guide:
+
+```bash
+curl -s -H "X-Demo-Employee-ID: EMP001" -H "Content-Type: application/json" \
+  -d '{"session_id":"s1","message":"I forgot my password and need a reset"}' http://127.0.0.1:8000/agent/chat
+curl -s -H "X-Demo-Employee-ID: EMP001" -H "Content-Type: application/json" \
+  -d '{"session_id":"s1","message":"yes"}' http://127.0.0.1:8000/agent/chat
+curl -s -X POST -H "X-Demo-Approver-ID: APR001" -H "Content-Type: application/json" \
+  -d '{"decision":"approve","reason":"verified"}' http://127.0.0.1:8000/approvals/PRV-0001/decision
+curl -s -H "X-Demo-Approver-ID: APR001" "http://127.0.0.1:8000/audit?correlation_id=PRV-0001"
+```
+
+State is in memory and starts empty each time the server starts. Nothing is written to `data/`.
+
+**What is where**
+
+| Path | What it is |
+| --- | --- |
+| `app/agent/` | Tools, server-side confirmation, sessions, the rule-based planner, the runner (step and retry limits) and the training command line (`python -m app.agent`) |
+| `app/governance/` | Permission matrix, approvals, redaction, audit log, privileged tools, the gateway and the governed command line (`python -m app.governance`) |
+| `app/runtime.py` | The in-memory services behind the new routes |
+| `evaluators/` | The trajectory evaluator, the prompt-injection demonstration and their command line |
+| `datasets/agent/trajectory_cases.json` | 36 trajectory cases (30 Week 5, 6 governance) |
+| `policies/day6_permission_matrix.md`, `policies/day6_approval_policy.md` | The documented rules (a test checks them against the code) |
+| `docs/day6_demo_guide.md` | Classroom guide: five demonstrations, expected output, student set-up |
+| `docs/day6_threat_model.md` | Threat model: identity, documents, tools, session state, logs |
+| `docs/day6_audit_examples.md` | Real redacted audit records, generated by `python -m evaluators audit-example` |
+| `docs/day6_notes.md` | What was built, evidence, failures found and limits |
+| `tests/agent/`, `tests/day6/` | Offline tests (network blocked, no credentials) |
+
+**Limitations (read these)**
+
+- The agent is **not a language model**. These tests show that the controls around an agent hold; they say nothing
+  about how a real model behaves. The prompt-injection demonstration uses a deliberately gullible *stand-in* for a model.
+- Identity is a **training header**, not real authentication. Anyone who can send a request can set it.
+- Redaction is pattern based. A secret typed with no label around it (for example just `hunter2`) is not detected.
+- Approvals, sessions and the audit log are **in memory, single process, single thread**. Concurrent use of one
+  approval is not tested, and the audit hash chain makes edits detectable, not impossible.
+- Another employee's privileged request, and another employee's confirmation, now return the **same** response as a
+  missing one in every state, so neither request IDs nor confirmation IDs can be probed. IDs remain sequential
+  (guessable), but a guess gives a non-owner nothing.
+- Counting rule used for BR09: each tool call is one step; a retry is not a new step.
+- The Day 1 and Day 2 sections above predate Days 3 to 6, so their "Expected: N passed" counts are out of date.
+
 ## Business rules
 
-See [`docs/business_rules.md`](docs/business_rules.md) for BR01–BR04 and
-where each one is implemented in the code.
+See [`docs/business_rules.md`](docs/business_rules.md). The **course catalogue BR01–BR12 is canonical**. The two Week 1
+rules that used to share the numbers BR03 and BR04 are now labelled **API-R03** (a missing ticket returns 404) and
+**API-R04** (VPN status has a status and an update time); their meaning and tests are unchanged. The document also has a
+table of where each rule is enforced and tested.
 
 ## Troubleshooting
 

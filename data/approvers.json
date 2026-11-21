@@ -1,0 +1,12 @@
+[
+  {
+    "approver_id": "APR001",
+    "full_name": "Simulated IT Approver",
+    "role": "it_approver"
+  },
+  {
+    "approver_id": "APR002",
+    "full_name": "Second Simulated IT Approver",
+    "role": "it_approver"
+  }
+]
