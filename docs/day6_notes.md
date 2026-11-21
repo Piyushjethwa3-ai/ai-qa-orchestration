@@ -111,7 +111,7 @@ All were replaced. The new versions use a planner that really attempts the actio
 
 **Release pass: other changes.** A student handoff checklist (`docs/day6_student_checklist.md`) whose test count, trajectory count, commands, paths and "look for" lines are checked by tests. A new test file reused the last four characters of a masked key that already appears in a committed Day 3 test; the new file now uses an obviously fake suffix. The Day 3 test was not touched.
 
-**Pre-existing, not changed:** `tests/day5/test_day5_faults.py:85` opens a file without closing it. It raises a `ResourceWarning` that only becomes a failure when warnings are treated as errors (`-W error`). It reproduces with only the Day 1 to 5 suites, so it predates this work. A normal run shows no warnings.
+**Pre-existing, not changed:** `tests/day5/test_day5_faults.py:85` opens a file without closing it. It raises a `ResourceWarning` that only becomes a failure when warnings are treated as errors (`-W error`). It reproduces with only the Day 1 to 5 suites, so it predates this work. A normal run may show one third-party Starlette/httpx deprecation warning, depending on the installed dependency versions. This warning does not indicate a test failure.
 
 ## 5. Decisions and assumptions to review
 
