@@ -49,7 +49,7 @@ Work through this top to bottom. Tick each box only when you saw the **expected 
 
 ## 2. Check that everything works (identical on macOS/Linux and Windows)
 
-- [ ] **Run every test.** Expected: `856 passed` with no failed, no skipped and no warnings. It takes under a minute.
+- [ ] **Run every test.** Expected: `856 passed`, meaning 856 tests passed, 0 failed, 0 skipped. A fresh installation may display one third-party Starlette/httpx deprecation warning. This does not indicate a test failure. It takes under a minute.
   ```
   python -m pytest -q
   ```

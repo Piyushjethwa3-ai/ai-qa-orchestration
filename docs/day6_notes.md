@@ -65,7 +65,7 @@ Run with `env -u OPENAI_API_KEY -u OPENAI_MODEL -u OPENAI_JUDGE_MODEL python -m 
 | Days 1 to 5 (unchanged) | 353 |
 | `tests/agent/` (Week 5) | 122 |
 | `tests/day6/` | 381 |
-| **Total** | **856 passed, 0 failed, 0 skipped, no warnings** |
+| **Total** | **856 tests passed, 0 failed, 0 skipped.** A fresh installation may display one third-party Starlette/httpx deprecation warning. This does not indicate a test failure. |
 
 - **Stability:** three consecutive full runs, five random-order runs (seeds 1 to 5), a reversed directory order, and the earlier Day 6 then Day 4 then Day 3 hazard order all gave 856 passed. A fresh copy built from exactly the release file list (no virtual environment, no caches, no reports) also passes all 856, all 36 trajectories and the demonstrations. Each suite also passes on its own.
 - **Trajectories:** 36 of 36 pass (A-01 to A-30 are the original Week 5 cases and are byte-for-byte unchanged; B-01 to B-06 are new). All twelve business rules are covered: BR07 by B-01 to B-04 and B-06, BR12 by A-29 and B-05. A test requires all twelve.
